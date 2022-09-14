@@ -5,5 +5,6 @@ def pcap2csv(filepath):
     feature_gen = Flowmeter(filepath)
 
     df = feature_gen.build_feature_dataframe()
-    df.to_csv(filepath.split('.pcap')[0]+'.csv')
-
+    csvpath = filepath.split('.pcap')[0]+'.csv'
+    df.to_csv(csvpath)
+    return csvpath

@@ -92,10 +92,10 @@ class KitNET:
             for a in range(len(self.ensembleLayer)):
                 # make sub inst
                 xi = x[self.v[a]]
+                #print(xi)
                 S_l1[a] = self.ensembleLayer[a].execute(xi)
             S = S_l1
 #             print('S')
-#             print(S)
             ## OutputLayer
             return self.outputLayer.execute(S_l1), S
 

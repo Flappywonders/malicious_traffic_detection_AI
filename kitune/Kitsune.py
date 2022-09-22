@@ -47,7 +47,6 @@ class Kitsune:
 
         # process KitNET
         P = self.AnomDetector.process(x)
-        #print(P)
         return P  # will train during the grace periods, then execute on all the rest.
 
     def proc_any_packet(self,row):

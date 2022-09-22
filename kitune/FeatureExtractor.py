@@ -2,6 +2,12 @@
 #Check if cython code has been compiled
 import os
 import subprocess
+from telnetlib import IP
+
+from scapy.layers.inet import TCP, UDP, ICMP
+from scapy.layers.inet6 import IPv6
+from scapy.layers.l2 import ARP
+
 print("Importing AfterImage Cython Library")
 if not os.path.isfile("AfterImage.c"): #has not yet been compiled, so try to do so...
     cmd = "python setup.py build_ext --inplace"
@@ -39,14 +45,11 @@ class FE:
         self.nstat = ns.netStat(np.nan, maxHost, maxSess)
 
     def _get_tshark_path(self):
-        if platform.system() == 'Windows':
-            return 'C:\Program Files\Wireshark\\tshark.exe'
-        else:
-            system_path = os.environ['PATH']
-            for path in system_path.split(os.pathsep):
-                filename = os.path.join(path, 'tshark')
-                if os.path.isfile(filename):
-                    return filename
+        system_path = os.environ['PATH']
+        for path in system_path.split(os.pathsep):
+            filename = os.path.join(path, 'tshark')
+            if os.path.isfile(filename):
+                return filename
         return ''
 
     def __prep__(self):
@@ -114,6 +117,8 @@ class FE:
         ### Parse next packet ###
         if self.parse_type == "tsv":
             row = self.tsvin.__next__()
+            if row[0] == 'break':
+                return []
             IPtype = np.nan
             timestamp = row[0]
             framelen = row[1]
@@ -256,6 +261,7 @@ class FE:
         cmd =  '"' + self._tshark + '" -r '+ self.path +' -T fields '+ fields +' -E header=y -E occurrence=f > '+self.path+".tsv"
         subprocess.call(cmd,shell=True)
         print("tshark parsing complete. File saved as: "+self.path +".tsv")
+
 
     def get_num_features(self):
         return len(self.nstat.getNetStatHeaders())

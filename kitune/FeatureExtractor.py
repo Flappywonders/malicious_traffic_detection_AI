@@ -117,8 +117,6 @@ class FE:
         ### Parse next packet ###
         if self.parse_type == "tsv":
             row = self.tsvin.__next__()
-            if row[0] == 'break':
-                return []
             IPtype = np.nan
             timestamp = row[0]
             framelen = row[1]
@@ -132,8 +130,7 @@ class FE:
                 srcIP = row[17]
                 dstIP = row[18]
                 IPtype = 1
-            srcproto = row[6] + row[
-                8]  # UDP or TCP port: the concatenation of the two port strings will will results in an OR "[tcp|udp]"
+            srcproto = row[6] + row[8]  # UDP or TCP port: the concatenation of the two port strings will will results in an OR "[tcp|udp]"
             dstproto = row[7] + row[9]  # UDP or TCP port
             srcMAC = row[2]
             dstMAC = row[3]

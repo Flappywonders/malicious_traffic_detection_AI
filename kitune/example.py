@@ -8,6 +8,8 @@ from scipy import stats
 import argparse
 import os
 
+from kitune.FeatureExtractor import FE
+
 packet_limit = np.Inf #the number of packets to process
 maxAE = 10 #maximum size for any autoencoder in the ensemble layer
 FMgrace = 200 #the number of instances taken to learn the feature mapping (the ensemble's architecture)
@@ -16,14 +18,6 @@ ADgrace = 0 #the number of instances used to train the anomaly detector (ensembl
 
 def write_tsv(root):
 
-	if str(root).find("train_white") != -1:
-		total_file = "train_feature_white.tsv"
-	elif str(root).find("train_black")!= -1:
-		total_file = "train_feature_black.tsv"
-	elif str(root).find("test_white")!= -1:
-		total_file = "test_feature_white.tsv"
-	else:
-		total_file = "test_feature_black.tsv"
 	i = 0
 	for dirpath, dirnames, filenames in os.walk(root):
 		for filename in filenames:
@@ -135,23 +129,50 @@ if __name__ == '__main__':
 	# for i in range(len(M)):
 	# 	print(len(M[i]),L[i])
 
+	#
+	# for dirpath, dirnames, filenames in os.walk('../../pcaps_divided/train_white'):
+	# 	i = 0
+	# 	for filename in filenames:
+	# 		path = os.path.join(dirpath, filename)
+	# 		# File location
+	# 		#path = "train_00000_20220111130000.pcap" #the pcap, pcapng, or tsv file to process.
+	# 		if ".tsv" in path:
+	# 			data = pd.read_csv(path,skipinitialspace=True,header=0,sep='\t')
+	# 			train_data = data[0:]
+	# 			with open('base_white.tsv','a+') as write_tsv:
+	# 				write_tsv.write(train_data.to_csv(sep='\t',index=False,header=None))
+	#
 
 	#
-	# data = pd.read_csv('test_feature_black.tsv',skipinitialspace=True,header=0,sep='\t')
+	data = pd.read_csv('./test_feature_black.tsv',skipinitialspace=True,header=0,sep='\t')
+	train_data = data[0:]
+	with open('base_black.tsv','a+') as write_tsv:
+		write_tsv.write(train_data.to_csv(sep='\t',index=False,header=None))
+	data = pd.read_csv('./train_feature_black.tsv',skipinitialspace=True,header=0,sep='\t')
+	train_data = data[0:]
+	with open('base_black.tsv','a+') as write_tsv:
+		write_tsv.write(train_data.to_csv(sep='\t',index=False,header=None))
+
+	# data = pd.read_csv('../train_feature_white.tsv',skipinitialspace=True,header=0,sep='\t')
+	# train_data = data[0:]
+	# with open('base_white.tsv','a+') as write_tsv:
+	# 	write_tsv.write(train_data.to_csv(sep='\t',index=False))
+
+	# data = pd.read_csv('../test_feature_black.tsv',skipinitialspace=True,header=0,sep='\t')
 	# train_data = data[0:]
 	# with open('total.tsv','a+') as write_tsv:
 	# 	write_tsv.write(train_data.to_csv(sep='\t',index=False))
-	# data = pd.read_csv('train_feature_black.tsv',skipinitialspace=True,header=0,sep='\t')
-	# train_data = data[0:]
-	# with open('total.tsv','a+') as write_tsv:
-	# 	write_tsv.write(train_data.to_csv(sep='\t',index=False,header=None))
-	# data = pd.read_csv('train_feature_white.tsv',skipinitialspace=True,header=0,sep='\t')
-	# train_data = data[0:]
+	# # data = pd.read_csv('../train_feature_black.tsv',skipinitialspace=True,header=0,sep='\t')
+	# # train_data = data[0:]
+	# # with open('total.tsv','a+') as write_tsv:
+	# # 	write_tsv.write(train_data.to_csv(sep='\t',index=False,header=None))
 	# with open('total.tsv','a+') as write_tsv:
 	# 	write_tsv.write('break	break\n')
-	# with open('total.tsv','a+') as write_tsv:
-	# 	write_tsv.write(train_data.to_csv(sep='\t',index=False,header=None))
-	# data = pd.read_csv('test_feature_white.tsv',skipinitialspace=True,header=0,sep='\t')
+	# # data = pd.read_csv('train_feature_white.tsv',skipinitialspace=True,header=0,sep='\t')
+	# # train_data = data[0:]
+	# # with open('total.tsv','a+') as write_tsv:
+	# # 	write_tsv.write(train_data.to_csv(sep='\t',index=False,header=None))
+	# data = pd.read_csv('../test_feature_white.tsv',skipinitialspace=True,header=0,sep='\t')
 	# train_data = data[0:]
 	# with open('total.tsv','a+') as write_tsv:
 	# 	write_tsv.write(train_data.to_csv(sep='\t',index=False,header=None))
@@ -161,51 +182,50 @@ if __name__ == '__main__':
 	# FMgrace = 200 #the number of instances taken to learn the feature mapping (the ensemble's architecture)
 	# ADgrace = 10 #the number of instances used to train the anomaly detector (ensemble itself)
 	#
-	total = Kitsune('total.tsv',packet_limit,maxAE,FMgrace,ADgrace)
-	print("Running Kitsune:")
-	#RMSEs = []
-	RMSEs_ensembleLayer = []
-	i = 0
-	start = time.time()
+	# total = Kitsune('total.tsv',packet_limit,maxAE,FMgrace,ADgrace)
+	# print("Running Kitsune:")
+	# #RMSEs = []
+	# RMSEs_ensembleLayer = []
+	# i = 0
+	# start = time.time()
 	# Here we process (train/execute) each individual packet.
 	# In this way, each observation is discarded after performing process() method.
-	while True:
-		i+=1
-		if i % 100000 == 0:
-			print(i)
-			#RMSEs_ensembleLayer = np.array(RMSEs_ensembleLayer)
-			np.save('blackfeatures'+str(i)+'.npy',RMSEs_ensembleLayer)
-			RMSEs_ensembleLayer = []
-		rmse, rmses_ensembleLayer = total.proc_next_packet()
-		#print(rmses_ensembleLayer)
-		if rmse == -1:
-			break
-		#RMSEs.append(rmse)
-		#print(rmse)
-		if i > FMgrace + ADgrace+1: #可能需要 +1 因为不知道为啥执行阶段第一个样本rmses_ensembleLayer是没有的
-			RMSEs_ensembleLayer.append(rmses_ensembleLayer)
-	#RMSEs_ensembleLayer = np.array(RMSEs_ensembleLayer)
-	np.save('blackfeatures'+str(i)+'.npy',RMSEs_ensembleLayer)
-	RMSEs_ensembleLayer = []
-	i = 0
-	while i<400000:
-		i+=1
-		if i % 100000 == 0:
-			print(i)
-			#RMSEs_ensembleLayer = np.array(RMSEs_ensembleLayer)
-			np.save('whitefeatures'+str(i)+'.npy',RMSEs_ensembleLayer)
-			RMSEs_ensembleLayer = []
-		rmse, rmses_ensembleLayer = total.proc_next_packet()
-		#print(rmses_ensembleLayer)
-		if rmse == -1:
-			break
-		#RMSEs.append(rmse)
-		#print(rmse)
-		RMSEs_ensembleLayer.append(rmses_ensembleLayer)
-	#RMSEs_ensembleLayer = np.array(RMSEs_ensembleLayer)
-	np.save('whitefeatures'+str(i)+'.npy',RMSEs_ensembleLayer)
-	RMSEs_ensembleLayer = []
-
-	stop = time.time()
-	print("Complete. Time elapsed: "+ str(stop - start))
-
+	# while True:
+	# 	i+=1
+	# 	if i % 100000 == 0:
+	# 		print(i)
+	# 		#RMSEs_ensembleLayer = np.array(RMSEs_ensembleLayer)
+	# 		np.save('blackfeatures'+str(i)+'.npy',RMSEs_ensembleLayer)
+	# 		RMSEs_ensembleLayer = []
+	# 	rmse, rmses_ensembleLayer = total.proc_next_packet()
+	# 	#print(rmses_ensembleLayer)
+	# 	if rmse == -1:
+	# 		break
+	# 	#RMSEs.append(rmse)
+	# 	#print(rmse)
+	# 	if i > FMgrace + ADgrace+1: #可能需要 +1 因为不知道为啥执行阶段第一个样本rmses_ensembleLayer是没有的
+	# 		RMSEs_ensembleLayer.append(rmses_ensembleLayer)
+	# #RMSEs_ensembleLayer = np.array(RMSEs_ensembleLayer)
+	# np.save('blackfeatures'+str(i)+'.npy',RMSEs_ensembleLayer)
+	# RMSEs_ensembleLayer = []
+	# i = 0
+	# while i<400000:
+	# 	i+=1
+	# 	if i % 100000 == 0:
+	# 		print(i)
+	# 		#RMSEs_ensembleLayer = np.array(RMSEs_ensembleLayer)
+	# 		np.save('whitefeatures'+str(i)+'.npy',RMSEs_ensembleLayer)
+	# 		RMSEs_ensembleLayer = []
+	# 	rmse, rmses_ensembleLayer = total.proc_next_packet()
+	# 	#print(rmses_ensembleLayer)
+	# 	if rmse == -1:
+	# 		break
+	# 	#RMSEs.append(rmse)
+	# 	#print(rmse)
+	# 	RMSEs_ensembleLayer.append(rmses_ensembleLayer)
+	# #RMSEs_ensembleLayer = np.array(RMSEs_ensembleLayer)
+	# np.save('whitefeatures'+str(i)+'.npy',RMSEs_ensembleLayer)
+	# RMSEs_ensembleLayer = []
+	#
+	# stop = time.time()
+	# print("Complete. Time elapsed: "+ str(stop - start))

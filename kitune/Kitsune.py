@@ -1,6 +1,7 @@
 from FeatureExtractor import *
 from KitNET.KitNET import KitNET
 
+
 # MIT License
 #
 # Copyright (c) 2018 Yisroel mirsky
